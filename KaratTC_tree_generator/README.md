@@ -24,7 +24,11 @@ gcc -o KaratTC_tree_gen KaratTC_tree_gen.c
 
 Macros (set via -D or in-source):
 
+<<<<<<< HEAD
 MODE (default 1): 1=HQC-1, 2=HQC-3, 3=HQC-5
+=======
+MODE (default 1): 1=HQC-128, 2=HQC-192, 3=HQC-256
+>>>>>>> f84ee1d175eb15598bb92c984868620c9a62bde9
 
 COMPARE_WITH_GF2XLIB (default 0): 1=comparison mode for gf2x
 

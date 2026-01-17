@@ -33,13 +33,18 @@
 #define CEIL_DIVIDE(a, b)  (((a)/(b)) + ((a) % (b) == 0 ? 0 : 1)) // Divide a by b and ceil the result
 
 #ifndef MODE
+<<<<<<< HEAD
     #define MODE 0      //1 : HQC-1, 2 : HQC-3, 3 : HQC-5, 0 : Custom  
+=======
+    #define MODE 1       //1 : hqc-128, 2 : hqc-192, 3 : hqc-256
+>>>>>>> f84ee1d175eb15598bb92c984868620c9a62bde9
 #endif
 
 #ifndef COMPARE_WITH_GF2XLIB
     #define COMPARE_WITH_GF2XLIB 0 //1: restrict choices for comparison with gf2x (karat2, tc3 only)
 #endif
 
+<<<<<<< HEAD
 #if MODE==1
 #define N_HQC 17669
 #elif MODE==2
@@ -48,6 +53,20 @@
 #define N_HQC 57637
 #else
 #define N_HQC (35851*2-65536) // Custom n for testing: override with any target polynomial length.
+=======
+#define HQC128 17669
+#define HQC192 35851
+#define HQC256 57637
+
+#if MODE==1
+#define N_HQC ((HQC128+31)/32)*256
+#elif MODE==2
+#define N_HQC ((HQC192+31)/32)*256
+#elif MODE==3
+#define N_HQC ((HQC256+31)/32)*256
+#else
+#define N_HQC 1285
+>>>>>>> f84ee1d175eb15598bb92c984868620c9a62bde9
 #endif
 
 #define KARAT2 0
@@ -56,7 +75,11 @@
 #define TC3    3
 
 #define MAX_W 50000         // evaluate weights w in [100, MAX_W-1] i.e., 1.00 to 499.99
+<<<<<<< HEAD
 #define POLY_LENGTH (CEIL_DIVIDE(N_HQC,32)) // top polynomial length (ceil to 32-blocks)
+=======
+#define POLY_LENGTH (CEIL_DIVIDE(N_HQC,256)) // top polynomial length (ceil to 256-blocks)
+>>>>>>> f84ee1d175eb15598bb92c984868620c9a62bde9
 
  /*
   * DP tables and metadata
@@ -137,6 +160,10 @@ int8_t arr_compare(uint64_t* A, uint64_t* B, int len) {
 /*
  * xor_cnt(len, alg): per-split XOR cost at length=len for the given algorithm.
  * Return value is scaled by 100 to match w_mul scaling.
+<<<<<<< HEAD
+=======
+ * Depending on len mod p, constants differ for each method (p=2,3,5; TC3).
+>>>>>>> f84ee1d175eb15598bb92c984868620c9a62bde9
  */
 #define XOR_CNT(len, alg) xor_cnt(len, alg)
 
@@ -626,6 +653,7 @@ int main()
     for (i = 0; i < diff_tree_w_len; i++) {
         print_tree(POLY_LENGTH, i);
 
+<<<<<<< HEAD
         // sort_print(length_before[diff_tree_weight[i]], firstalg_before[diff_tree_weight[i]], length_before_len[diff_tree_weight[i]]);
 
         printf("\n\nTotal basemuls  = %ld\n", muls_final[diff_tree_weight[i]]);
@@ -637,6 +665,19 @@ int main()
             printf("Total weight sum = %ld * w_mul + %ld\n\n\n", muls_final[diff_tree_weight[i]], XORs_final[diff_tree_weight[i]]/100);
         }
         else printf("Total weight sum (%ld) != total unit multiplications * weight + total XOR count (%ld)\n\n\n", w_min[diff_tree_weight[i]][POLY_LENGTH]/100, (muls_final[diff_tree_weight[i]] * diff_tree_weight[i] + XORs_final[diff_tree_weight[i]])/100);
+=======
+        //sort_print(length_before[diff_tree_weight[i]], firstalg_before[diff_tree_weight[i]], length_before_len[diff_tree_weight[i]]);
+
+        printf("\n\nTotal basemuls  = %ld\n", muls_final[diff_tree_weight[i]]);
+
+        printf("Total XOR count = %ld\n\n", XORs_final[diff_tree_weight[i]]);
+        print_call_stats(POLY_LENGTH, diff_tree_weight[i]);
+#if !ONLY_MUL
+        if (w_min[diff_tree_weight[i]][POLY_LENGTH] == muls_final[diff_tree_weight[i]] * diff_tree_weight[i] + XORs_final[diff_tree_weight[i]]) {
+            printf("Total weight sum = %ld * w_mul + %ld\n\n\n", muls_final[diff_tree_weight[i]], XORs_final[diff_tree_weight[i]]);
+        }
+        else printf("Total weight sum (%ld) != total unit multiplications * weight + total XOR count (%ld)\n\n\n", w_min[diff_tree_weight[i]][POLY_LENGTH], muls_final[diff_tree_weight[i]] * diff_tree_weight[i] + XORs_final[diff_tree_weight[i]]);
+>>>>>>> f84ee1d175eb15598bb92c984868620c9a62bde9
 #endif
     }
     return 0;
