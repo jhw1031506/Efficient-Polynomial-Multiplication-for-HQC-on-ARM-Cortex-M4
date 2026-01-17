@@ -1,4 +1,5 @@
 # Efficient Polynomial Multiplication for HQC on ARM Cortex-M4
+- Available at: [https://eprint.iacr.org/2025/1939](https://eprint.iacr.org/2025/1939)
 
 ## Authors
 
