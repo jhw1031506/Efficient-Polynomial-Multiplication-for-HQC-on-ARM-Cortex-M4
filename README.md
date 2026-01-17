@@ -1,0 +1,38 @@
+# Efficient Polynomial Multiplication for HQC on ARM Cortex-M4
+
+## Contents
+
+- **HQC_opt_pqm4**: Implementation of HQC on Cortex-M4, which can be integrated into [PQM4](https://github.com/mupq/pqm4).
+
+- **KaratTC_tree_generator**: Generator for Karatsuba/Toom-Cook combination trees.
+
+## Instructions for benchmarking
+
+Our implementation targets the NUCLEO-L4R5ZI (STM32L4R5ZI) board. 
+
+### Integrate to pqm4
+
+First, download the pqm4 library:
+
+```bash
+git clone --recursive https://github.com/mupq/pqm4.git
+```
+
+Then, copy the contents of
+`HQC_opt_pqm4/FAFFT_LJKH25`,
+`HQC_opt_pqm4/FAFFT_butterfly_opt`,
+`HQC_opt_pqm4/hybrid_FAFFT-CRT`,
+`HQC_opt_pqm4/hybrid_FAFFT-Karatsuba`,
+`HQC_opt_pqm4/radix16`
+ into `pqm4/crypto_kem`:
+
+```bash
+cp -r HQC_opt_pqm4/FAFFT_LJKH25/* pqm4/crypto_kem/
+cp -r HQC_opt_pqm4/FAFFT_butterfly_opt/* pqm4/crypto_kem/
+cp -r HQC_opt_pqm4/hybrid_FAFFT-CRT/* pqm4/crypto_kem/
+cp -r HQC_opt_pqm4/hybrid_FAFFT-Karatsuba/* pqm4/crypto_kem/
+cp -r HQC_opt_pqm4/radix-16/* pqm4/crypto_kem/
+cd pqm4
+```
+
+From this point on, follow the standard workflow of the pqm4 framework.
