@@ -1,9 +1,6 @@
 # Efficient Polynomial Multiplication for HQC on ARM Cortex-M4
-- Available at: [https://eprint.iacr.org/2025/1939](https://eprint.iacr.org/2025/1939)
 
-## Authors
-
-- Jihoon Jang, Myeonghoon Lee, Donggeun Kwon, Seokhie Hong, Suhri Kim, Sangjin Lee
+Anonymous submission to CHES 2026.
 
 ## License
 
@@ -28,19 +25,19 @@ git clone --recursive https://github.com/mupq/pqm4.git
 ```
 
 Then, copy the contents of
-`HQC_opt_pqm4/FAFFT_LJKH25`,
+`HQC_opt_pqm4/FAFFT_baseline`,
 `HQC_opt_pqm4/FAFFT_butterfly_opt`,
 `HQC_opt_pqm4/hybrid_FAFFT-CRT`,
-`HQC_opt_pqm4/hybrid_FAFFT-Karatsuba`,
+`HQC_opt_pqm4/hybrid_Karatsuba-FAFFT`,
 `HQC_opt_pqm4/radix16`
  into `pqm4/crypto_kem`:
 
 ```bash
-cp -r HQC_opt_pqm4/FAFFT_LJKH25/* pqm4/crypto_kem/
+cp -r HQC_opt_pqm4/FAFFT_baseline/* pqm4/crypto_kem/
 cp -r HQC_opt_pqm4/FAFFT_butterfly_opt/* pqm4/crypto_kem/
 cp -r HQC_opt_pqm4/hybrid_FAFFT-CRT/* pqm4/crypto_kem/
-cp -r HQC_opt_pqm4/hybrid_FAFFT-Karatsuba/* pqm4/crypto_kem/
-cp -r HQC_opt_pqm4/radix-16/* pqm4/crypto_kem/
+cp -r HQC_opt_pqm4/hybrid_Karatsuba-FAFFT/* pqm4/crypto_kem/
+cp -r HQC_opt_pqm4/radix16/* pqm4/crypto_kem/
 cd pqm4
 ```
 
@@ -50,5 +47,4 @@ From this point on, follow the standard workflow of the pqm4 framework.
 
 Our implementation is based on the following works:
 
-- For the HQC implementation, we utilized code from *"Improved Frobenius FFT for Code-Based Cryptography on Cortex-M4"* by Myeonghoon Lee et al., IEEE Internet of Things Journal, 2025.
-  The corresponding code is available at: [https://github.com/myhoon/FAFFT_HQC](https://github.com/myhoon/FAFFT_HQC)
+- For the HQC implementation, we utilized code from *"Improved Frobenius FFT for Code-Based Cryptography on Cortex-M4"* by Myeonghoon Lee et al., IEEE Internet of Things Journal, 2025. This corresponds to the `FAFFT_baseline` directory, which serves as the baseline against which our optimized variants are compared.

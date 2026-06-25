@@ -6,11 +6,12 @@
 
 /*
  *  - For GF(2) polynomial multiplication using divide-and-conquer schemes
- *    (Karatsuba 2/3/5-way and Toom-Cook 3-way), this program finds the optimal
+ *    (2/3/5-Karatsuba and Toom-Cook 3-way), this program finds the optimal
  *    recursive multiplication tree that minimizes:
  *        total_cost = (number_of_basemuls) * w_mul + (number_of_XORs)
  *    where w_mul is the relative cost (scaled by 100).
- *  - For each weight w and length len (1..POLY_LENGTH), dynamic programming
+ *  - For each weight w and length len (1..POLY_LENGTH, with len=1..4 as base
+ *    cases and the DP loop running over len=5..POLY_LENGTH), dynamic programming
  *    computes the minimal total cost w_min[w][len] and records the first split
  *    algorithm first_alg[w][len] that achieves it.
  *  - For the top length (POLY_LENGTH), the code prints the chosen tree and
@@ -33,7 +34,7 @@
 #define CEIL_DIVIDE(a, b)  (((a)/(b)) + ((a) % (b) == 0 ? 0 : 1)) // Divide a by b and ceil the result
 
 #ifndef MODE
-    #define MODE 0      //1 : HQC-1, 2 : HQC-3, 3 : HQC-5, 0 : Custom  
+    #define MODE 1      //1 : HQC-1, 2 : HQC-3, 3 : HQC-5, 0 : Custom  
 #endif
 
 #ifndef COMPARE_WITH_GF2XLIB
@@ -142,18 +143,18 @@ int8_t arr_compare(uint64_t* A, uint64_t* B, int len) {
 
 uint64_t xor_cnt(uint64_t len, uint64_t alg) {
     uint64_t k;
-    if (alg == KARAT2) { // 2-way Karatsuba
+    if (alg == KARAT2) { // 2-Karatsuba
         k = len / 2;
         if (len % 2 == 0) return 100 * (7 * k);
         else return 100 * (7 * k + 3);
     }
-    if (alg == KARAT3) { // 3-way Karatsuba
+    if (alg == KARAT3) { // 3-Karatsuba
         k = len / 3;
         if (len % 3 == 0) return 100 * (20 * k);
         if (len % 3 == 1) return 100 * (20 * k + 8);
         else return 100 * (20 * k + 14);
     }
-    if (alg == KARAT5) { // 5-way Karatsuba
+    if (alg == KARAT5) { // 5-Karatsuba
         k = len / 5;
         if (len % 5 == 0) return 100 * (80 * k);
         else return UINT32_MAX;
@@ -162,7 +163,7 @@ uint64_t xor_cnt(uint64_t len, uint64_t alg) {
         k = len / 3;
         if (len % 3 == 0) return 100 * (38 * k + 18);
         if (len % 3 == 1) return 100 * (38 * k + 22);
-        else return 100 * (38 * k + 31);             
+        else return 100 * (38 * k + 32);             
     }
 }
 
@@ -176,12 +177,12 @@ uint64_t xor_cnt(uint64_t len, uint64_t alg) {
  */
 uint64_t mul_cnt(uint64_t len, uint64_t alg, int w) {
     uint64_t k;
-    if (alg == 0) { // 2-way Karatsuba
+    if (alg == 0) { // 2-Karatsuba
         k = len / 2;
         if (len % 2 == 0) return 3 * w_min[w][k];
         else return w_min[w][k] + 2 * w_min[w][k + 1];
     }
-    if (alg == 1) { // 3-way Karatsuba
+    if (alg == 1) { // 3-Karatsuba
 #if COMPARE_WITH_GF2XLIB == 1
         return (uint64_t)UINT_MAX * 1024; // artificially penalize when comparing with gf2x
 #endif
@@ -190,7 +191,7 @@ uint64_t mul_cnt(uint64_t len, uint64_t alg, int w) {
         if (len % 3 == 1) return 3 * w_min[w][k] + 3 * w_min[w][k + 1];
         else return w_min[w][k] + 5 * w_min[w][k + 1];
     }
-    if (alg == 2) { // 5-way Karatsuba
+    if (alg == 2) { // 5-Karatsuba
 #if COMPARE_WITH_GF2XLIB == 1
         return UINT_MAX; // artificially penalize when comparing with gf2x
 #endif
@@ -407,7 +408,6 @@ void print_subtree(uint64_t len, int depth, uint64_t mul_w, uint64_t* print_befo
 
     /* Recurse into children depending on algorithm and remainder */
     if (first_alg[mul_w][len] == KARAT2) {
-        // printf("alg0,depth=%d   ",*depth);
         print_subtree(len / 2, depth + 1, mul_w, print_before, print_before_len);
         if (len % 2 != 0) {
             for (i = 0; i < depth + 1; i++) printf("\t");
@@ -415,7 +415,6 @@ void print_subtree(uint64_t len, int depth, uint64_t mul_w, uint64_t* print_befo
         }
     }
     else if (first_alg[mul_w][len] == KARAT3) {
-        // printf("alg1,depth=%d   ", *depth);
         print_subtree(len / 3, depth + 1, mul_w, print_before, print_before_len);
         if (len % 3 != 0) {
             for (i = 0; i < depth + 1; i++) printf("\t");
@@ -423,12 +422,10 @@ void print_subtree(uint64_t len, int depth, uint64_t mul_w, uint64_t* print_befo
         }
     }
     else if (first_alg[mul_w][len] == KARAT5) {
-        // printf("alg2,depth=%d   ", *depth);
         if (len % 5 != 0) printf("\nError : 5karat - len = %ld is not a 5k\n", len);
         else print_subtree(len / 5, depth + 1, mul_w, print_before, print_before_len);
     }
     else if (first_alg[mul_w][len] == TC3) {
-        // printf("alg3,depth=%d   ", *depth);
         if (len % 3 == 0) {
             print_subtree(len / 3, depth + 1, mul_w, print_before, print_before_len);
             for (i = 0; i < depth + 1; i++) printf("\t");
@@ -474,7 +471,7 @@ int main()
     size_t i, j, w;
     uint64_t tmp;
     uint16_t p, r;
-    uint64_t w_2karat;  // cost if computed via 2-way Karatsuba at this (w,len)
+    uint64_t w_2karat;  // cost if computed via 2-Karatsuba at this (w,len)
     uint64_t w_3karat;
     uint64_t w_5karat;
     uint64_t w_tc3;
@@ -544,13 +541,13 @@ int main()
             w_min[w][i] = min(w_min[w][i], w_tc3);
             if (w_5karat == w_min[w][i]) {
                 first_alg[w][i] = KARAT5;
-                /* 5-way Karatsuba: 15 child multiplications of equal size (i/5) */
+                /* 5-Karatsuba: 15 child multiplications of equal size (i/5) */
                 muls[i] = 15 * muls[i / 5];
                 XORs[i] = 15 * XORs[i / 5] + xor_cnt(i, KARAT5);
             }
             else if (w_3karat == w_min[w][i]) {
                 first_alg[w][i] = KARAT3;
-                /* 3-way Karatsuba: case splits by i % 3 */
+                /* 3-Karatsuba: three cases by i % 3 */
                 if (i % 3 == 0) {
                     muls[i] = 6 * muls[i / 3];
                     XORs[i] = 6 * XORs[i / 3] + xor_cnt(i, KARAT3);
@@ -566,7 +563,7 @@ int main()
             }
             else if (w_2karat == w_min[w][i]) {
                 first_alg[w][i] = KARAT2;
-                /* 2-way Karatsuba: even vs odd split (k,k) or (k,k+1,k+1) */
+                /* 2-Karatsuba: two cases by i % 2 */
                 if (i % 2 == 0) {
                     muls[i] = 3 * muls[i / 2];
                     XORs[i] = 3 * XORs[i / 2] + xor_cnt(i, KARAT2);
@@ -578,7 +575,7 @@ int main()
             }
             else if (w_tc3 == w_min[w][i]) {
                 first_alg[w][i] = TC3;
-                /* Toom-Cook 3-way: three cases by i % 3 (uses k, k+1, k+2, and occasionally k-1) */
+                /* Toom-Cook 3-way: three cases by i % 3 */
                 if (i % 3 == 0) {
                     muls[i] = 3 * muls[i / 3] + 2 * muls[i / 3 + 2];
                     XORs[i] = 3 * XORs[i / 3] + 2 * XORs[i / 3 + 2] + xor_cnt(i, TC3);

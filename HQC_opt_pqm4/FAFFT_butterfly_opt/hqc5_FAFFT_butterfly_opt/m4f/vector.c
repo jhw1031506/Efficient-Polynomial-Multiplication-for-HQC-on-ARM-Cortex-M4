@@ -207,7 +207,7 @@ void vect_sample_fixed_weight2(shake256_xof_ctx *ctx, uint64_t *v, uint16_t weig
  */
 void vect_set_random(shake256_xof_ctx *ctx, uint64_t *v) {
     xof_get_bytes(ctx, (uint8_t *)v, VEC_N_SIZE_BYTES);
-    v[VEC_N_SIZE_64 - 1] &= BITMASK(PARAM_N, 64);
+    v[VEC_N_SIZE_64 - 1] &= RED_MASK;
 }
 
 /**

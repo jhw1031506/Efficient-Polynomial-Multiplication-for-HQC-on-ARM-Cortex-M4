@@ -31,7 +31,7 @@ COMPARE_WITH_GF2XLIB (default 0): 1=comparison mode for gf2x
 Example:
 
 ```bash
-gcc -DMODE=3 -DCOMPARE_WITH_GF2XLIB=1 -o KaratTC_tree_gen KaratTC_tree_gen.c
+gcc -DMODE=3 -DCOMPARE_WITH_GF2XLIB=0 -o KaratTC_tree_gen KaratTC_tree_gen.c
 ```
 
 ## Run
